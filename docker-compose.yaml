@@ -1,0 +1,35 @@
+services:
+  postgres:
+    container_name: postgres
+    restart: always
+    image: postgres:17-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=hotel
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hotel"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  web:
+    container_name: django_hotel
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DB_NAME=hotel
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
