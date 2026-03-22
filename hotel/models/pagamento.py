@@ -17,7 +17,7 @@ class Pagamento(models.Model):
 
     reserva = models.ForeignKey(Reserva, on_delete=models.CASCADE, related_name='pagamentos')
 
-    #
+    ##
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
     data_pagamento = models.DateTimeField(null=True, blank=True)
     metodo = models.CharField(max_length=30, choices=MetodoPagamento.choices)

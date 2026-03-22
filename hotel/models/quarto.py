@@ -14,7 +14,7 @@ class Quarto(models.Model):
         OCUPADO = 'OCUPADO', 'Ocupado'
 
     numero = models.CharField(max_length=10, unique=True)
-    #
+    ##
     tipo = models.CharField(
         max_length=20,
         choices=TipoQuarto.choices,
