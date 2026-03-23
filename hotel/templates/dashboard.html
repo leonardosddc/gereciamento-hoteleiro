@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu Principal - Gerenciamento Hoteleiro</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; color: #333; margin: 0; }
+        .header { background-color: #2c3e50; color: white; padding: 20px 0; text-align: center; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 28px; }
+        .container { max-width: 900px; margin: auto; text-align: center; }
+        
+        /* Estilo dos Cards do Menu */
+        .menu-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .menu-card { 
+            background: white; width: 220px; padding: 40px 20px; 
+            border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            text-decoration: none; color: #333; transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+        .menu-icon { font-size: 50px; margin-bottom: 15px; }
+        .menu-title { font-size: 20px; font-weight: bold; }
+        
+        /* Card das reservas que ainda vamos fazer */
+        .card-disabled { opacity: 0.6; cursor: not-allowed; }
+        .card-disabled:hover { transform: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏨 Sistema de Gerenciamento Hoteleiro</h1>
+    </div>
+
+    <div class="container">
+        <div class="menu-grid">
+            <a href="{% url 'listar_hospedes' %}" class="menu-card">
+                <div class="menu-icon">👥</div>
+                <div class="menu-title">Hóspedes</div>
+            </a>
+            
+            <a href="{% url 'listar_quartos' %}" class="menu-card">
+                <div class="menu-icon">🛏️</div>
+                <div class="menu-title">Quartos</div>
+            </a>
+            
+            <a href="#" class="menu-card card-disabled">
+                <div class="menu-icon">📅</div>
+                <div class="menu-title">Reservas</div>
+                <small style="color: #888;">(Em breve)</small>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
