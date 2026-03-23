@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Hóspedes</title>
+    <style>
+        /* Mesma base do formulário */
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; color: #333; }
+        .container { max-width: 800px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: auto; }
+        h2 { text-align: center; margin-bottom: 20px; }
+        
+        /* Transformando o link em botão verde */
+        .btn-novo { display: inline-block; margin-bottom: 20px; padding: 10px 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; }
+        .btn-novo:hover { background-color: #218838; }
+
+        /* Estilizando a Tabela */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; font-weight: bold; }
+        tr:hover { background-color: #f1f1f1; } /* Efeito ao passar o mouse na linha */
+
+        /* Botões de Ação */
+        .btn-editar { color: #007bff; text-decoration: none; margin-right: 15px; font-weight: bold; }
+        .btn-editar:hover { text-decoration: underline; }
+        .btn-excluir { color: #dc3545; text-decoration: none; font-weight: bold; }
+        .btn-excluir:hover { text-decoration: underline; }
+        
+        .empty-msg { text-align: center; color: #777; font-style: italic; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Hóspedes Cadastrados</h2>
+        
+        <a href="{% url 'cadastrar_hospede' %}" class="btn-novo">+ Novo Hóspede</a>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Email</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hospede in hospedes %}
+                <tr>
+                    <td>{{ hospede.nome }}</td>
+                    <td>{{ hospede.cpf }}</td>
+                    <td>{{ hospede.email }}</td>
+                    <td>
+                        <a href="{% url 'editar_hospede' hospede.id %}" class="btn-editar">Editar</a>
+                        <a href="{% url 'excluir_hospede' hospede.id %}" class="btn-excluir">Excluir</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-msg">Nenhum hóspede cadastrado ainda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
