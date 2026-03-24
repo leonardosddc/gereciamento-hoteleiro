@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmar Exclusão</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; color: #333; }
+        .container { max-width: 500px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: auto; text-align: center; }
+        h2 { color: #dc3545; }
+        p { margin-bottom: 20px; font-size: 16px; }
+        .btn-excluir { padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; margin-right: 10px; }
+        .btn-cancelar { padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Atenção!</h2>
+        <p>Você tem certeza que deseja excluir o registro de pagamento de <strong>R$ {{ pagamento.valor_total }}</strong> da reserva de <strong>{{ pagamento.reserva.hospede.nome }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-excluir">Sim, Excluir</button>
+            <a href="{% url 'listar_pagamentos' %}" class="btn-cancelar">Cancelar</a>
+        </form>
+    </div>
+</body>
+</html>

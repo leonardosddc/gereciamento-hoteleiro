@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ acao }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: auto; }
+        h2 { color: #333; text-align: center; }
+        form p { margin-bottom: 15px; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #55E6a5; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #38c887; }
+        .errorlist { color: #dc3545; list-style: none; padding: 0; margin: -10px 0 10px 0; font-size: 14px; font-weight: bold; }
+        .btn-voltar { display: block; text-align: center; margin-top: 15px; text-decoration: none; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>{{ acao }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Salvar Pagamento</button>
+        </form>
+        <a href="{% url 'listar_pagamentos' %}" class="btn-voltar">← Voltar para a lista</a>
+    </div>
+</body>
+</html>

@@ -2,8 +2,8 @@ from django.urls import path
 from .views.home import dashboard
 from .views.hospede import cadastrar_hospede, listar_hospedes, editar_hospede, excluir_hospede
 from .views.quarto import cadastrar_quarto, listar_quartos, editar_quarto, excluir_quarto
-from .views.reserva import cadastrar_reserva, listar_reservas, editar_reserva, excluir_reserva # NOVA IMPORTAÇÃO
-
+from .views.reserva import cadastrar_reserva, listar_reservas, editar_reserva, excluir_reserva
+from .views.pagamento import cadastrar_pagamento, listar_pagamentos, editar_pagamento, excluir_pagamento # NOVA IMPORTAÇÃO
 urlpatterns = [
     path('', dashboard, name='dashboard'),
 
@@ -24,4 +24,11 @@ urlpatterns = [
     path('reservas/novo/', cadastrar_reserva, name='cadastrar_reserva'),
     path('reservas/editar/<int:id>/', editar_reserva, name='editar_reserva'),
     path('reservas/excluir/<int:id>/', excluir_reserva, name='excluir_reserva'),
+
+    # Pagamentos (NOVAS ROTAS)
+    path('pagamentos/', listar_pagamentos, name='listar_pagamentos'),
+    path('pagamentos/novo/', cadastrar_pagamento, name='cadastrar_pagamento'),
+    path('pagamentos/editar/<int:id>/', editar_pagamento, name='editar_pagamento'),
+    path('pagamentos/excluir/<int:id>/', excluir_pagamento, name='excluir_pagamento'),
+
 ]
