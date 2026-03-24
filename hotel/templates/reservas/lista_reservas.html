@@ -2,10 +2,10 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Quartos</title>
+    <title>Lista de Reservas</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; color: #333; }
-        .container { max-width: 800px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: auto; }
+        .container { max-width: 900px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: auto; }
         h2 { text-align: center; margin-bottom: 20px; }
         .btn-novo { display: inline-block; margin-bottom: 20px; padding: 10px 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; }
         .btn-novo:hover { background-color: #218838; }
@@ -16,41 +16,44 @@
         .btn-editar { color: #007bff; text-decoration: none; margin-right: 15px; font-weight: bold; }
         .btn-excluir { color: #dc3545; text-decoration: none; font-weight: bold; }
         .badge { padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
-        .badge-LIMPO { background-color: #28a745; }
-        .badge-SUJO { background-color: #fd7e14; }
-        .badge-MANUTENCAO { background-color: #6c757d; }
-        .badge-OCUPADO { background-color: #dc3545; }
+        .badge-AGENDADA { background-color: #007bff; }
+        .badge-CHECK_IN { background-color: #28a745; }
+        .badge-CHECK_OUT { background-color: #6c757d; }
+        .badge-CANCELADA { background-color: #dc3545; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Quartos do Hotel</h2>
-        <a href="{% url 'cadastrar_quarto' %}" class="btn-novo">+ Novo Quarto</a>
+        <h2>Gestão de Reservas</h2>
+        <a href="{% url 'cadastrar_reserva' %}" class="btn-novo">+ Nova Reserva</a>
         <a href="{% url 'dashboard' %}" style="display: inline-block; margin-left: 10px; color: #6c757d; text-decoration: none; font-weight: bold;">🏠 Menu</a>
+        
         <table>
             <thead>
                 <tr>
-                    <th>Número</th>
-                    <th>Tipo</th>
+                    <th>Hóspede</th>
+                    <th>Quarto</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
                     <th>Status</th>
-                    <th>Preço (R$)</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
-                {% for quarto in quartos %}
+                {% for reserva in reservas %}
                 <tr>
-                    <td><strong>{{ quarto.numero }}</strong></td>
-                    <td>{{ quarto.get_tipo_display }}</td>
-                    <td><span class="badge badge-{{ quarto.status }}">{{ quarto.get_status_display }}</span></td>
-                    <td>R$ {{ quarto.preco_diaria }}</td>
+                    <td><strong>{{ reserva.hospede.nome }}</strong></td>
+                    <td>Quarto {{ reserva.quarto.numero }}</td>
+                    <td>{{ reserva.data_checkin|date:"d/m/Y" }}</td>
+                    <td>{{ reserva.data_checkout|date:"d/m/Y" }}</td>
+                    <td><span class="badge badge-{{ reserva.status }}">{{ reserva.get_status_display }}</span></td>
                     <td>
-                        <a href="{% url 'editar_quarto' quarto.id %}" class="btn-editar">Editar</a>
-                        <a href="{% url 'excluir_quarto' quarto.id %}" class="btn-excluir">Excluir</a>
+                        <a href="{% url 'editar_reserva' reserva.id %}" class="btn-editar">Editar</a>
+                        <a href="{% url 'excluir_reserva' reserva.id %}" class="btn-excluir">Excluir</a>
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" style="text-align: center;">Nenhum quarto cadastrado.</td></tr>
+                <tr><td colspan="6" style="text-align: center;">Nenhuma reserva cadastrada.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
