@@ -1,6 +1,8 @@
 from django import forms
 from django.utils import timezone
 from hotel.models.pagamento import Pagamento
+from datetime import timedelta
+
 
 class PagamentoForm(forms.ModelForm):
     class Meta:
@@ -32,12 +34,19 @@ class PagamentoForm(forms.ModelForm):
 
         # 2. VALIDAÇÃO: Lógica de Datas
         if status == 'CONCLUIDO' and data_pagamento and reserva:
+            agora = timezone.now()
             
-            # (Removemos a trava de data no futuro para facilitar os testes do TCC)
-            
-            # Regra B: O pagamento não pode ser anterior à criação da própria reserva
+            # Regra A: O pagamento não pode ocorrer antes da reserva existir no sistema
             if data_pagamento < reserva.criada_em:
-                self.add_error('data_pagamento', "O pagamento não pode ter ocorrido antes da reserva ser criada no sistema.")
+                self.add_error('data_pagamento', "O pagamento não pode ter ocorrido antes da reserva ser criada.")
+
+            # Regra B (A SUA REGRA!): Pagamento TEM que ser antes ou no máximo no dia do Check-in
+            # Usamos .date() porque data_pagamento tem hora, e data_checkin não.
+            if data_pagamento.date() > reserva.data_checkin:
+                self.add_error(
+                    'data_pagamento', 
+                    f"O pagamento deve ser concluído até a data do Check-in ({reserva.data_checkin.strftime('%d/%m/%Y')}). Ninguém entra sem pagar! 😉"
+                )
 
         # 3. Validação: Consistência Matemática do Valor
         if reserva and valor_total:
