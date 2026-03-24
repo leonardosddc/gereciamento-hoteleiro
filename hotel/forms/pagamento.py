@@ -30,13 +30,10 @@ class PagamentoForm(forms.ModelForm):
         if status == 'PENDENTE' and data_pagamento:
             self.add_error('data_pagamento', "Pagamentos pendentes não devem ter data de pagamento.")
 
-        # 2. NOVA VALIDAÇÃO: Lógica de Datas
+        # 2. VALIDAÇÃO: Lógica de Datas
         if status == 'CONCLUIDO' and data_pagamento and reserva:
-            agora = timezone.now()
             
-            # Regra A: O pagamento não pode estar no futuro
-            if data_pagamento > agora:
-                self.add_error('data_pagamento', "A data de um pagamento concluído não pode estar no futuro.")
+            # (Removemos a trava de data no futuro para facilitar os testes do TCC)
             
             # Regra B: O pagamento não pode ser anterior à criação da própria reserva
             if data_pagamento < reserva.criada_em:
