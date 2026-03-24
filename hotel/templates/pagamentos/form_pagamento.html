@@ -25,5 +25,30 @@
         </form>
         <a href="{% url 'listar_pagamentos' %}" class="btn-voltar">← Voltar para a lista</a>
     </div>
+    <script>
+        // 1. Recebemos o dicionário do Python (backend) com os valores calculados
+        const precosReservas = JSON.parse('{{ valores_json|safe }}');
+        
+        // 2. Localizamos os campos na tela (o Django nomeia eles com "id_" na frente)
+        const campoReserva = document.getElementById('id_reserva');
+        const campoValor = document.getElementById('id_valor_total');
+
+        // 3. Criamos o "Gatilho": Toda vez que a pessoa mudar a caixinha de reserva, fazemos isso:
+        campoReserva.addEventListener('change', function() {
+            const reservaId = this.value; // Pega o ID numérico da reserva selecionada
+            
+            // Se o usuário selecionou uma reserva válida, preenche o valor
+            if (reservaId && precosReservas[reservaId]) {
+                campoValor.value = precosReservas[reservaId];
+                
+                // Opcional: Efeito visual rapidinho para mostrar que foi automático
+                campoValor.style.backgroundColor = '#e8f5e9'; // Fica verde clarinho
+                setTimeout(() => { campoValor.style.backgroundColor = ''; }, 500);
+            } else {
+                // Se a pessoa selecionar a opção "---------", limpa o campo
+                campoValor.value = '';
+            }
+        });
+    </script>
 </body>
 </html>

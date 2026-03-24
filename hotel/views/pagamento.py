@@ -1,7 +1,21 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models.pagamento import Pagamento
 from ..forms.pagamento import PagamentoForm
+from ..models.reserva import Reserva
 
+# Nova função: Calcula os valores de todas as reservas e transforma em JSON para o JavaScript
+def obter_valores_reservas():
+    valores = {}
+    for reserva in Reserva.objects.all():
+        dias = (reserva.data_checkout - reserva.data_checkin).days
+        if dias == 0:
+            dias = 1
+        # Multiplica os dias pelo preço e guarda no dicionário
+        valores[reserva.id] = str(dias * reserva.quarto.preco_diaria)
+    return json.dumps(valores)
+
+# --- CREATE ---
 def cadastrar_pagamento(request):
     if request.method == 'POST':
         form = PagamentoForm(request.POST)
@@ -10,13 +24,21 @@ def cadastrar_pagamento(request):
             return redirect('listar_pagamentos')
     else:
         form = PagamentoForm()
-    return render(request, 'pagamentos/form_pagamento.html', {'form': form, 'acao': 'Novo Pagamento'})
+    
+    # Adicionamos os valores no 'contexto' para enviar ao HTML
+    contexto = {
+        'form': form, 
+        'acao': 'Novo Pagamento',
+        'valores_json': obter_valores_reservas()
+    }
+    return render(request, 'pagamentos/form_pagamento.html', contexto)
 
+# --- READ ---
 def listar_pagamentos(request):
-    # select_related com 'reserva__hospede' ajuda o banco a buscar as informações mais rápido
     pagamentos = Pagamento.objects.all().select_related('reserva__hospede', 'reserva__quarto').order_by('-id')
     return render(request, 'pagamentos/lista_pagamentos.html', {'pagamentos': pagamentos})
 
+# --- UPDATE ---
 def editar_pagamento(request, id):
     pagamento = get_object_or_404(Pagamento, id=id)
     if request.method == 'POST':
@@ -26,8 +48,15 @@ def editar_pagamento(request, id):
             return redirect('listar_pagamentos')
     else:
         form = PagamentoForm(instance=pagamento)
-    return render(request, 'pagamentos/form_pagamento.html', {'form': form, 'acao': 'Editar Pagamento'})
+        
+    contexto = {
+        'form': form, 
+        'acao': 'Editar Pagamento',
+        'valores_json': obter_valores_reservas()
+    }
+    return render(request, 'pagamentos/form_pagamento.html', contexto)
 
+# --- DELETE ---
 def excluir_pagamento(request, id):
     pagamento = get_object_or_404(Pagamento, id=id)
     if request.method == 'POST':
