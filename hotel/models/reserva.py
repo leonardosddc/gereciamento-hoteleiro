@@ -2,6 +2,7 @@ from django.db import models
 from .hospede import Hospede
 from .quarto import Quarto
 
+
 class Reserva(models.Model):
     class StatusReserva(models.TextChoices):
         AGENDADA = 'AGENDADA', 'Agendada'
@@ -13,7 +14,6 @@ class Reserva(models.Model):
     hospede = models.ForeignKey(Hospede, on_delete=models.CASCADE, related_name='reservas')
     quarto = models.ForeignKey(Quarto, on_delete=models.PROTECT, related_name='reservas')
 
-##
     data_checkin = models.DateField()
     data_checkout = models.DateField()
     status = models.CharField(
