@@ -21,6 +21,12 @@
         .badge-PENDENTE { background-color: #ffc107; color: #333; }
         .badge-CONCLUIDO { background-color: #28a745; }
         .badge-ESTORNADO { background-color: #dc3545; }
+
+        /* Estilos dos botões do Mercado Pago */
+        .btn-gerar-mp { background-color: #009ee3; color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; margin-right: 15px; font-size: 12px; }
+        .btn-gerar-mp:hover { background-color: #0088c4; }
+        .btn-copiar { background-color: #25D366; color: white; border: none; padding: 6px 10px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-right: 15px; font-size: 12px; }
+        .btn-copiar:hover { background-color: #1ebe57; }
     </style>
 </head>
 <body>
@@ -55,6 +61,19 @@
                         {% endif %}
                     </td>
                     <td>
+                        {% if pagamento.status == 'PENDENTE' %}
+                            {% if pagamento.link_pagamento %}
+                                <input type="hidden" id="link-{{ pagamento.id }}" value="{{ pagamento.link_pagamento }}">
+                                <button onclick="copiarLink('{{ pagamento.id }}')" class="btn-copiar">
+                                    Copiar Link MP
+                                </button>
+                            {% else %}
+                                <a href="{% url 'gerar_link_pagamento' pagamento.id %}" class="btn-gerar-mp">
+                                    Gerar Link MP
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
                         <a href="{% url 'editar_pagamento' pagamento.id %}" class="btn-editar">Editar</a>
                         <a href="{% url 'excluir_pagamento' pagamento.id %}" class="btn-excluir">Excluir</a>
                     </td>
@@ -65,5 +84,19 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        function copiarLink(id) {
+            // Pega o valor do input escondido correspondente a esta linha
+            var textoLink = document.getElementById('link-' + id).value;
+            
+            // Usa a API do navegador para jogar o link na área de transferência
+            navigator.clipboard.writeText(textoLink).then(function() {
+                alert('Link copiado com sucesso! 🎉\n\nAgora é só dar um "Ctrl+V" no WhatsApp do hóspede.');
+            }).catch(function(err) {
+                alert('Ops! Erro ao copiar o link: ' + err);
+            });
+        }
+    </script>
 </body>
 </html>

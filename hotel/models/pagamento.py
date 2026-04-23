@@ -26,5 +26,8 @@ class Pagamento(models.Model):
         default=StatusPagamento.PENDENTE
     )
 
+    id_transacao_externa = models.CharField(max_length=100, null=True, blank=True)
+    link_pagamento = models.URLField(null=True, blank=True)
+
     def __str__(self):
         return f"Pagamento {self.id} - {self.status}"

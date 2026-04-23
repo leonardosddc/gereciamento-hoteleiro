@@ -3,7 +3,14 @@ from .views.home import dashboard
 from .views.hospede import cadastrar_hospede, listar_hospedes, editar_hospede, excluir_hospede
 from .views.quarto import cadastrar_quarto, listar_quartos, editar_quarto, excluir_quarto
 from .views.reserva import cadastrar_reserva, listar_reservas, editar_reserva, excluir_reserva
-from .views.pagamento import cadastrar_pagamento, listar_pagamentos, editar_pagamento, excluir_pagamento # NOVA IMPORTAÇÃO
+from .views.pagamento import (
+    cadastrar_pagamento,
+    listar_pagamentos,
+    editar_pagamento,
+    excluir_pagamento,
+    gerar_link_pagamento,
+    webhook_mercado_pago
+) # NOVA IMPORTAÇÃO
 urlpatterns = [
     path('', dashboard, name='dashboard'),
 
@@ -31,4 +38,11 @@ urlpatterns = [
     path('pagamentos/editar/<int:id>/', editar_pagamento, name='editar_pagamento'),
     path('pagamentos/excluir/<int:id>/', excluir_pagamento, name='excluir_pagamento'),
 
+
+    # NOVAS ROTAS DA INTEGRAÇÃO
+    # Rota para o botão de "Gerar PIX"
+    path('pagamentos/gerar-link/<int:pagamento_id>/', gerar_link_pagamento, name='gerar_link_pagamento'),
+    
+    # Rota do Webhook (A URL que você vai cadastrar lá no painel do Mercado Pago)
+    path('webhook/mercadopago/', webhook_mercado_pago, name='webhook_mp'),
 ]
