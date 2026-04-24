@@ -14,6 +14,7 @@
         th { background-color: #f8f9fa; font-weight: bold; }
         tr:hover { background-color: #f1f1f1; }
         .btn-editar { color: #007bff; text-decoration: none; margin-right: 15px; font-weight: bold; }
+        .btn-consumacao { color: #6f42c1; text-decoration: none; margin-right: 15px; font-weight: bold; }
         .btn-excluir { color: #dc3545; text-decoration: none; font-weight: bold; }
         .badge { padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
         .badge-AGENDADA { background-color: #007bff; }
@@ -49,6 +50,7 @@
                     <td><span class="badge badge-{{ reserva.status }}">{{ reserva.get_status_display }}</span></td>
                     <td>
                         <a href="{% url 'editar_reserva' reserva.id %}" class="btn-editar">Editar</a>
+                        <a href="{% url 'gerenciar_consumacao' reserva.id %}" class="btn-consumacao">Consumação</a>
                         <a href="{% url 'excluir_reserva' reserva.id %}" class="btn-excluir">Excluir</a>
                     </td>
                 </tr>

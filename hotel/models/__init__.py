@@ -2,3 +2,4 @@ from .hospede import Hospede
 from .quarto import Quarto
 from .reserva import Reserva
 from .pagamento import Pagamento
+from .consumacao import Consumacao

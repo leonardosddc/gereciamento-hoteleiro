@@ -10,7 +10,9 @@ from .views.pagamento import (
     excluir_pagamento,
     gerar_link_pagamento,
     webhook_mercado_pago
-) # NOVA IMPORTAÇÃO
+)
+from .views.consumacao import gerenciar_consumacao, liquidar_consumacao
+
 urlpatterns = [
     path('', dashboard, name='dashboard'),
 
@@ -45,4 +47,8 @@ urlpatterns = [
     
     # Rota do Webhook (A URL que você vai cadastrar lá no painel do Mercado Pago)
     path('webhook/mercadopago/', webhook_mercado_pago, name='webhook_mp'),
+
+    # Consumação (NOVAS ROTAS)
+    path('reservas/<int:reserva_id>/consumacao/', gerenciar_consumacao, name='gerenciar_consumacao'),
+    path('consumacao/liquidar/<int:consumacao_id>/', liquidar_consumacao, name='liquidar_consumacao'),
 ]

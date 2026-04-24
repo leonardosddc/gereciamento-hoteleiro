@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Consumação - Sistema Hoteleiro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; }
+        .card { border: none; border-radius: 10px; }
+        .status-badge { font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+        <span class="navbar-brand">🏨 Gerenciamento Hoteleiro</span>
+        <a href="{% url 'listar_reservas' %}" class="btn btn-outline-light btn-sm">Voltar às Reservas</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">Reserva #{{ reserva.id }}</h4>
+                        <p class="text-muted mb-0">Hóspede: <strong>{{ reserva.hospede.nome }}</strong> | Quarto: <strong>{{ reserva.quarto.numero }}</strong></p>
+                    </div>
+                    <div class="text-end">
+                        <span class="text-muted d-block small">Saldo Pendente</span>
+                        <h3 class="{% if total_pendente > 0 %}text-danger{% else %}text-success{% endif %}">
+                            R$ {{ total_pendente|floatformat:2 }}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0">Novo Lançamento</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Item / Serviço</label>
+                            {{ form.item }}
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Qtd</label>
+                                {{ form.quantidade }}
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Valor Un.</label>
+                                {{ form.valor_unitario }}
+                            </div>
+                        </div>
+                        <div class="form-check mb-3">
+                            {{ form.pago }}
+                            <label class="form-check-label">Já está pago?</label>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 py-2">Registrar Consumo</button>
+                    </form>
+                </div>
+            </div>
+
+            {% if total_pendente > 0 %}
+            <div class="alert alert-warning border-warning">
+                <strong>Atenção:</strong> O Check-out está <strong>bloqueado</strong> enquanto houver saldo pendente.
+            </div>
+            {% else %}
+            <div class="alert alert-success border-success">
+                <strong>Liberado:</strong> Não há pendências de consumação para esta reserva.
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0">Extrato de Consumação</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data</th>
+                                <th>Item</th>
+                                <th>Qtd</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in consumacoes %}
+                            <tr>
+                                <td class="small text-muted">{{ c.data_lancamento|date:"d/m H:i" }}</td>
+                                <td>{{ c.item }}</td>
+                                <td>{{ c.quantidade }}x</td>
+                                <td><strong>R$ {{ c.valor_total }}</strong></td>
+                                <td>
+                                    {% if c.pago %}
+                                        <span class="badge bg-success status-badge">Pago</span>
+                                    {% else %}
+                                        <span class="badge bg-danger status-badge">Pendente</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if not c.pago %}
+                                        <a href="{% url 'liquidar_consumacao' c.id %}" class="btn btn-sm btn-outline-primary">Quitar</a>
+                                    {% else %}
+                                        <span class="text-muted small">Quitado</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    Nenhum consumo registrado para este hóspede.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -15,29 +15,38 @@ class ReservaForm(forms.ModelForm):
         cleaned_data = super().clean()
         data_checkin = cleaned_data.get("data_checkin")
         data_checkout = cleaned_data.get("data_checkout")
-
-        # Pega a data atual do servidor
+        status = cleaned_data.get("status")
         hoje = date.today()
 
         if data_checkin and data_checkout:
-            
-            # 1. Valida se o check-in é uma data passada
             if data_checkin < hoje:
                 self.add_error('data_checkin', "O Check-in não pode ser feito em uma data no passado.")
 
-            # 2. NOVA VALIDAÇÃO: Impede check-in absurdamente distante (Máximo de 3 anos)
-            # 3 anos = aproximadamente 1095 dias (365 * 3)
             limite_futuro = hoje + timedelta(days=365 * 3)
             if data_checkin > limite_futuro:
                 self.add_error('data_checkin', "Não é possível agendar reservas com mais de 3 anos de antecedência.")
 
-            # 3. Valida se o check-out não é anterior ou igual ao check-in
             if data_checkout <= data_checkin:
                 self.add_error('data_checkout', "A data de Check-out deve ser posterior à de Check-in.")
             else:
-                # 4. Valida o limite máximo de 6 meses de estadia
                 limite_estadia = timedelta(days=180)
                 if (data_checkout - data_checkin) > limite_estadia:
                     self.add_error('data_checkout', "A estadia não pode ultrapassar o limite de 6 meses (180 dias).")
+
+        # --- REGRAS DE NEGÓCIO DO TCC (Trava de Status) ---
+        if self.instance.pk: # Se a reserva já existe no banco...
+            
+            # REGRA 1: Bloqueia Check-in se a diária não estiver paga
+            if status == 'CHECK_IN':
+                pagamento_ok = self.instance.pagamentos.filter(status='CONCLUIDO').exists()
+                if not pagamento_ok:
+                    self.add_error('status', "Check-in bloqueado: O pagamento da estadia ainda não foi concluído.")
+            
+            # REGRA 2: Bloqueia Check-out se houver consumação pendente
+            if status == 'CHECK_OUT':
+                consumacoes_pendentes = self.instance.consumacoes.filter(pago=False)
+                if consumacoes_pendentes.exists():
+                    total_devendo = sum(c.valor_total for c in consumacoes_pendentes)
+                    self.add_error('status', f"Check-out bloqueado: O hóspede possui R$ {total_devendo:.2f} em consumação pendente.")
 
         return cleaned_data
