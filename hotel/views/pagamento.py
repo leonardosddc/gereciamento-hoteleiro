@@ -130,7 +130,7 @@ def webhook_mercado_pago(request):
                 
                 if id_pagamento_mp:
                     # 1. Pergunta para o Mercado Pago os detalhes desse pagamento
-                    sdk = mercadopago.SDK("APP_USR-3893030212427160-032814-575f2eef3d5b103e0d102509d7269839-329897126") # Seu Token
+                    sdk = mercadopago.SDK(os.getenv("MERCADO_PAGO_ACCESS_TOKEN"))
                     payment_info = sdk.payment().get(id_pagamento_mp)
                     
                     if payment_info["status"] == 200:
