@@ -99,10 +99,9 @@ def gerar_link_pagamento(request, pagamento_id):
                 "number": reserva.hospede.cpf
             },
         },
-        # Você pode referenciar o ID externo aqui para facilitar a busca no webhook
         "external_reference": str(pagamento.id),
+        "notification_url": "https://sprint-ladder-steadily.ngrok-free.dev/webhook/mercadopago/",
     }
-
     # 3. Faz a requisição para criar o Link
     preference_response = sdk.preference().create(preference_data)
     preference = preference_response["response"]
