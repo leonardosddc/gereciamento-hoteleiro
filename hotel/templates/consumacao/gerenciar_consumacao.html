@@ -29,11 +29,18 @@
                         <h4 class="mb-0">Reserva #{{ reserva.id }}</h4>
                         <p class="text-muted mb-0">Hóspede: <strong>{{ reserva.hospede.nome }}</strong> | Quarto: <strong>{{ reserva.quarto.numero }}</strong></p>
                     </div>
-                    <div class="text-end">
-                        <span class="text-muted d-block small">Saldo Pendente</span>
-                        <h3 class="{% if total_pendente > 0 %}text-danger{% else %}text-success{% endif %}">
-                            R$ {{ total_pendente|floatformat:2 }}
-                        </h3>
+                    <div class="text-end d-flex align-items-center gap-3">
+                        <div>
+                            <span class="text-muted d-block small">Saldo Pendente</span>
+                            <h3 class="{% if total_pendente > 0 %}text-danger{% else %}text-success{% endif %} mb-0">
+                                R$ {{ total_pendente|floatformat:2 }}
+                            </h3>
+                        </div>
+                        {% if total_pendente > 0 %}
+                            <a href="{% url 'pagar_consumacao_online' reserva.id %}" class="btn btn-success fw-bold px-3">
+                                💳 Pagar Online
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -71,11 +78,11 @@
             </div>
 
             {% if total_pendente > 0 %}
-            <div class="alert alert-warning border-warning">
+            <div class="alert alert-warning border-warning shadow-sm">
                 <strong>Atenção:</strong> O Check-out está <strong>bloqueado</strong> enquanto houver saldo pendente.
             </div>
             {% else %}
-            <div class="alert alert-success border-success">
+            <div class="alert alert-success border-success shadow-sm">
                 <strong>Liberado:</strong> Não há pendências de consumação para esta reserva.
             </div>
             {% endif %}

@@ -116,7 +116,21 @@ def gerar_link_pagamento(request, pagamento_id):
     
     return redirect('listar_pagamentos')
 
-# SUBSTITUA SEU WEBHOOK POR ESTE:
+# Adicione essa função auxiliar no seu views/pagamento.py (pode ser antes do webhook)
+def traduzir_metodo_pagamento(mp_method_id):
+    """ Mapeia o retorno de texto do Mercado Pago para os Choices do seu Model """
+    method = str(mp_method_id).lower()
+    if 'pix' in method:
+        return 'PIX'
+    elif 'ticket' in method or 'bolbradesco' in method:
+        return 'BOLETO_BANCARIO'
+    elif 'debit' in method:
+        return 'CARTAO_DEBITO'
+    else:
+        # Padrão para crédito (visa, mastercard, amex, etc)
+        return 'CARTAO_CREDITO'
+
+# ATUALIZE O SEU WEBHOOK PARA FICAR ASSIM:
 @csrf_exempt
 def webhook_mercado_pago(request):
     if request.method == 'POST':
@@ -139,14 +153,34 @@ def webhook_mercado_pago(request):
                         pagamento_id_interno = info.get("external_reference")
                         status_pagamento = info.get("status")
                         
-                        # 3. Se foi aprovado, atualiza no nosso banco de dados
+                        # CAPTURA O MÉTODO REAL USADO NO MERCADO PAGO:
+                        metodo_utilizado_mp = info.get("payment_method_id") # Ex: 'pix', 'mastercard'
+                        metodo_convertido = traduzir_metodo_pagamento(metodo_utilizado_mp)
+                        
                         if pagamento_id_interno and status_pagamento == 'approved':
-                            pagamento = Pagamento.objects.filter(id=pagamento_id_interno).first()
                             
-                            if pagamento and pagamento.status != 'CONCLUIDO':
-                                pagamento.status = 'CONCLUIDO'
-                                pagamento.data_pagamento = timezone.now()
-                                pagamento.save()
+                            # --- CENÁRIO A: É PAGAMENTO DE CONSUMAÇÃO ---
+                            if str(pagamento_id_interno).startswith("CONSUMACAO_"):
+                                pk_real = pagamento_id_interno.split("_")[1]
+                                pagamento = Pagamento.objects.filter(id=pk_real).first()
+                            
+                                if pagamento and pagamento.status != 'CONCLUIDO':
+                                    pagamento.status = 'CONCLUIDO'
+                                    pagamento.metodo = metodo_convertido # <-- ATUALIZA COM O MÉTODO REAL!
+                                    pagamento.data_pagamento = timezone.now()
+                                    pagamento.save()
+
+                                    pagamento.reserva.consumacoes.filter(pago=False).update(pago=True)
+                            
+                            # --- CENÁRIO B: É PAGAMENTO DE DIÁRIA PADRÃO ---
+                            else:
+                                pagamento = Pagamento.objects.filter(id=pagamento_id_interno).first()
+
+                                if pagamento and pagamento.status != 'CONCLUIDO':
+                                    pagamento.status = 'CONCLUIDO'
+                                    pagamento.metodo = metodo_convertido # <-- ATUALIZA COM O MÉTODO REAL SE FOR CRIADO PELO ADMIN!
+                                    pagamento.data_pagamento = timezone.now()
+                                    pagamento.save()
                                 
             return JsonResponse({"status": "sucesso"}, status=200)
         except Exception as e:

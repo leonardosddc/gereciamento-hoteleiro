@@ -1,6 +1,10 @@
+import os
+import mercadopago
+
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models.reserva import Reserva
 from ..models.consumacao import Consumacao
+from ..models.pagamento import Pagamento
 from ..forms.consumacao import ConsumacaoForm
 
 def gerenciar_consumacao(request, reserva_id):
@@ -41,3 +45,55 @@ def liquidar_consumacao(request, consumacao_id):
     consumacao.save()
     # Volta para a tela de gerenciamento daquela mesma reserva
     return redirect('gerenciar_consumacao', reserva_id=consumacao.reserva.id)
+
+def pagar_consumacao_online(request, reserva_id):
+    """ Gera um link de checkout do Mercado Pago para TODAS as consumações pendentes daquela reserva """
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+    consumacoes_pendentes = reserva.consumacoes.filter(pago=False)
+    
+    total_pendente = sum(c.valor_total for c in consumacoes_pendentes)
+    
+    if total_pendente <= 0:
+        return redirect('gerenciar_consumacao', reserva_id=reserva.id)
+        
+    # 1. Cria um registro em Pagamento histórico (Marcamos como tipo diferente se quiser, mas usaremos Pix/Cartão padrão)
+    pagamento = Pagamento.objects.create(
+        reserva=reserva,
+        valor_total=total_pendente,
+        status='PENDENTE'
+    )
+    
+    # 2. Configura o SDK do Mercado Pago
+    sdk = mercadopago.SDK(os.getenv("MERCADO_PAGO_ACCESS_TOKEN"))
+    
+    # 3. Monta os dados (adicionando uma tag especial no título para o webhook saber diferenciar)
+    preference_data = {
+        "items": [
+            {
+                "id": f"CONSUMACAO_{pagamento.id}", # ID especial com prefixo
+                "title": f"Consumações Pendentes - Reserva {reserva.id}",
+                "quantity": 1,
+                "currency_id": "BRL",
+                "unit_price": float(total_pendente),
+            }
+        ],
+        "payer": {
+            "name": reserva.hospede.nome,
+            "email": reserva.hospede.email,
+        },
+        "external_reference": f"CONSUMACAO_{pagamento.id}", # Tag crucial para o Webhook identificar
+        "notification_url": "https://sprint-ladder-steadily.ngrok-free.dev/webhook/mercadopago/",
+    }
+    
+    preference_response = sdk.preference().create(preference_data)
+    preference = preference_response["response"]
+    
+    if preference.get("id"):
+        pagamento.id_transacao_externa = preference["id"]
+        pagamento.link_pagamento = preference["sandbox_init_point"]
+        pagamento.save()
+        
+        # Redireciona o hóspede direto para a tela de pagamento do Mercado Pago
+        return redirect(pagamento.link_pagamento)
+        
+    return redirect('gerenciar_consumacao', reserva_id=reserva.id)

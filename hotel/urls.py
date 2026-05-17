@@ -11,7 +11,7 @@ from .views.pagamento import (
     gerar_link_pagamento,
     webhook_mercado_pago
 )
-from .views.consumacao import gerenciar_consumacao, liquidar_consumacao
+from .views.consumacao import gerenciar_consumacao, liquidar_consumacao, pagar_consumacao_online
 
 urlpatterns = [
     path('', dashboard, name='dashboard'),
@@ -50,5 +50,6 @@ urlpatterns = [
 
     # Consumação (NOVAS ROTAS)
     path('reservas/<int:reserva_id>/consumacao/', gerenciar_consumacao, name='gerenciar_consumacao'),
+    path('reservas/<int:reserva_id>/consumacao/pagar-online/', pagar_consumacao_online, name='pagar_consumacao_online'),
     path('consumacao/liquidar/<int:consumacao_id>/', liquidar_consumacao, name='liquidar_consumacao'),
 ]

@@ -19,7 +19,7 @@ class Pagamento(models.Model):
 
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
     data_pagamento = models.DateTimeField(null=True, blank=True)
-    metodo = models.CharField(max_length=30, choices=MetodoPagamento.choices)
+    metodo = models.CharField(max_length=30, choices=MetodoPagamento.choices, null=True)
     status = models.CharField(
         max_length=20, 
         choices=StatusPagamento.choices, 
