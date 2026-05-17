@@ -11,6 +11,12 @@ class ReservaForm(forms.ModelForm):
             'data_checkout': forms.DateInput(attrs={'type': 'date'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.pk:
+            if 'status' in self.fields:
+                del self.fields['status']
+
     def clean(self):
         cleaned_data = super().clean()
         data_checkin = cleaned_data.get("data_checkin")
