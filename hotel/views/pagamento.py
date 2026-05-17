@@ -77,7 +77,7 @@ def gerar_link_pagamento(request, pagamento_id):
     reserva = pagamento.reserva
     
     # 1. Configura o Mercado Pago
-    sdk = mercadopago.SDK(os.getenv("MERCARDO_PAGO_ACCESS_TOKEN"))
+    sdk = mercadopago.SDK(os.getenv("MERCADO_PAGO_ACCESS_TOKEN"))
 
     # 2. Monta o pacote de dados da 'Preferência' (Checkout Pro)
     preference_data = {
