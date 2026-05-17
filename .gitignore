@@ -171,3 +171,4 @@ secrets.yml
 !local.template.env
 
 postgres/
+mysql/

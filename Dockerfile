@@ -16,6 +16,12 @@ COPY ./ /app
 WORKDIR /app
 RUN mkdir -p /app/_credentials
 
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    default-libmysqlclient-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install requirements
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
