@@ -27,7 +27,11 @@ SECRET_KEY = 'django-insecure-01qpgu1yha*2k_w*1$hkp)wqlv!y#y7nt0ads1kzb4_@-fz1yr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1', 
+    'sprint-ladder-steadily.ngrok-free.dev'
+]
 
 
 # Application definition
@@ -77,12 +81,12 @@ WSGI_APPLICATION = 'gerenciamento_hoteleiro.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ.get('DB_NAME', 'hotel'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('PASSWORD', 'postgres'),
-        'HOST': os.environ.get('DB_HOST', 'postgres'),
-        'PORT': os.environ.get('DB_PORT', '5432')
+        'USER': os.environ.get('DB_USER', 'admin'),
+        'PASSWORD': os.environ.get('PASSWORD', 'admin'),
+        'HOST': os.environ.get('DB_HOST', 'mysql'),
+        'PORT': os.environ.get('DB_PORT', '3306')
     }
 }
 
