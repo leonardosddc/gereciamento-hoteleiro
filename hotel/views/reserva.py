@@ -11,7 +11,7 @@ def cadastrar_reserva(request):
             return redirect('listar_reservas')
     else:
         form = ReservaForm()
-    return render(request, 'reservas/form_reserva.html', {'form': form, 'acao': 'Nova Reserva'})
+    return render(request, 'reservas/form_reserva.html', {'form': form, 'acao': 'Efetuar Reserva'})
 
 # --- READ ---
 def listar_reservas(request):

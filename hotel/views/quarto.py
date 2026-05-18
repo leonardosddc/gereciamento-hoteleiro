@@ -11,7 +11,7 @@ def cadastrar_quarto(request):
             return redirect('listar_quartos')
     else:
         form = QuartoForm()
-    return render(request, 'quartos/form_quarto.html', {'form': form, 'acao': 'Novo Quarto'})
+    return render(request, 'quartos/form_quarto.html', {'form': form, 'acao': 'Registrar Quarto'})
 
 # --- READ ---
 def listar_quartos(request):
