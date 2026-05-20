@@ -7,13 +7,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from ..models.pagamento import Pagamento
 from ..forms.pagamento import PagamentoForm
 from ..models.reserva import Reserva
-from django.contrib.auth.decorators import login_required # 1. Importe o decorador
 
-@login_required
+# RECORREÇÃO: Removeu-se o @login_required daqui (é uma função auxiliar)
 def obter_valores_reservas():
     valores = {}
     for reserva in Reserva.objects.all():
@@ -115,15 +115,12 @@ def gerar_link_pagamento(request, pagamento_id):
     # 4. Salva a URL no banco de dados
     if preference.get("id"):
         pagamento.id_transacao_externa = preference["id"]
-        # Usamos o 'sandbox_init_point' porque estamos no ambiente de testes do TCC!
-        # Na vida real (produção), usaríamos apenas 'init_point'
         pagamento.link_pagamento = preference["sandbox_init_point"] 
         pagamento.save()
     
     return redirect('listar_pagamentos')
 
-# Adicione essa função auxiliar no seu views/pagamento.py (pode ser antes do webhook)
-@login_required
+# RECORREÇÃO: Removeu-se o @login_required daqui também (é uma função auxiliar)
 def traduzir_metodo_pagamento(mp_method_id):
     """ Mapeia o retorno de texto do Mercado Pago para os Choices do seu Model """
     method = str(mp_method_id).lower()
@@ -134,59 +131,51 @@ def traduzir_metodo_pagamento(mp_method_id):
     elif 'debit' in method:
         return 'CARTAO_DEBITO'
     else:
-        # Padrão para crédito (visa, mastercard, amex, etc)
         return 'CARTAO_CREDITO'
 
-# ATUALIZE O SEU WEBHOOK PARA FICAR ASSIM:
+# O Webhook continua sem @login_required para permitir o acesso do bot do Mercado Pago
 @csrf_exempt
-@login_required
 def webhook_mercado_pago(request):
     if request.method == 'POST':
         try:
             dados = json.loads(request.body)
             
-            # O Mercado Pago pode enviar 'action' ou 'type' dependendo da versão configurada
             if dados.get("action") == "payment.updated" or dados.get("type") == "payment":
                 id_pagamento_mp = dados.get("data", {}).get("id")
                 
                 if id_pagamento_mp:
-                    # 1. Pergunta para o Mercado Pago os detalhes desse pagamento
                     sdk = mercadopago.SDK(os.getenv("MERCADO_PAGO_ACCESS_TOKEN"))
                     payment_info = sdk.payment().get(id_pagamento_mp)
                     
                     if payment_info["status"] == 200:
                         info = payment_info["response"]
                         
-                        # 2. Pega a "etiqueta" (external_reference) e o status real
                         pagamento_id_interno = info.get("external_reference")
                         status_pagamento = info.get("status")
                         
-                        # CAPTURA O MÉTODO REAL USADO NO MERCADO PAGO:
-                        metodo_utilizado_mp = info.get("payment_method_id") # Ex: 'pix', 'mastercard'
+                        metodo_utilizado_mp = info.get("payment_method_id")
                         metodo_convertido = traduzir_metodo_pagamento(metodo_utilizado_mp)
                         
                         if pagamento_id_interno and status_pagamento == 'approved':
                             
-                            # --- CENÁRIO A: É PAGAMENTO DE CONSUMAÇÃO ---
                             if str(pagamento_id_interno).startswith("CONSUMACAO_"):
                                 pk_real = pagamento_id_interno.split("_")[1]
                                 pagamento = Pagamento.objects.filter(id=pk_real).first()
                             
                                 if pagamento and pagamento.status != 'CONCLUIDO':
                                     pagamento.status = 'CONCLUIDO'
-                                    pagamento.metodo = metodo_convertido # <-- ATUALIZA COM O MÉTODO REAL!
+                                    pagamento.metodo = metodo_convertido
                                     pagamento.data_pagamento = timezone.now()
                                     pagamento.save()
 
                                     pagamento.reserva.consumacoes.filter(pago=False).update(pago=True)
                             
-                            # --- CENÁRIO B: É PAGAMENTO DE DIÁRIA PADRÃO ---
                             else:
                                 pagamento = Pagamento.objects.filter(id=pagamento_id_interno).first()
 
                                 if pagamento and pagamento.status != 'CONCLUIDO':
                                     pagamento.status = 'CONCLUIDO'
-                                    pagamento.metodo = metodo_convertido # <-- ATUALIZA COM O MÉTODO REAL SE FOR CRIADO PELO ADMIN!
+                                    pagamento.metodo = metodo_convertido
                                     pagamento.data_pagamento = timezone.now()
                                     pagamento.save()
                                 

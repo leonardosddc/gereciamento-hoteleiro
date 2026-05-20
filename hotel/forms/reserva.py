@@ -22,6 +22,7 @@ class ReservaForm(forms.ModelForm):
         data_checkin = cleaned_data.get("data_checkin")
         data_checkout = cleaned_data.get("data_checkout")
         status = cleaned_data.get("status")
+        quarto = cleaned_data.get("quarto")
         hoje = date.today()
 
         if data_checkin and data_checkout:
@@ -38,6 +39,25 @@ class ReservaForm(forms.ModelForm):
                 limite_estadia = timedelta(days=180)
                 if (data_checkout - data_checkin) > limite_estadia:
                     self.add_error('data_checkout', "A estadia não pode ultrapassar o limite de 6 meses (180 dias).")
+
+            # --- TRAVA DE OVERBOOKING (RF05) ---
+            if quarto:
+                # Busca se o mesmo quarto já tem reservas ativas no período selecionado
+                reservas_conflitantes = Reserva.objects.filter(
+                    quarto=quarto,
+                    status__in=['AGENDADA', 'CHECK_IN']
+                ).filter(
+                    data_checkin__lt=data_checkout,  # Check-in existente antes do novo Check-out
+                    data_checkout__gt=data_checkin   # Check-out existente depois do novo Check-in
+                )
+
+                # Se estivermos EDITANDO uma reserva antiga, não deixamos ela conflitar com ela mesma
+                if self.instance.pk:
+                    reservas_conflitantes = reservas_conflitantes.exclude(pk=self.instance.pk)
+
+                # Se houver conflitos de agenda, exibe o erro na tela anexado ao campo do Quarto
+                if reservas_conflitantes.exists():
+                    self.add_error('quarto', "Overbooking bloqueado! Este quarto já possui uma reserva ativa para esse período.")
 
         # --- REGRAS DE NEGÓCIO DO TCC (Trava de Status) ---
         if self.instance.pk: # Se a reserva já existe no banco...
