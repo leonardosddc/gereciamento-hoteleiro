@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models.quarto import Quarto
 from ..forms.quarto import QuartoForm
+from django.contrib.auth.decorators import login_required # 1. Importe o decorador
 
 # --- CREATE ---
+@login_required
 def cadastrar_quarto(request):
     if request.method == 'POST':
         form = QuartoForm(request.POST)
@@ -14,12 +16,14 @@ def cadastrar_quarto(request):
     return render(request, 'quartos/form_quarto.html', {'form': form, 'acao': 'Registrar Quarto'})
 
 # --- READ ---
+@login_required
 def listar_quartos(request):
     # O order_by('numero') já traz a lista em ordem numérica/alfabética
     quartos = Quarto.objects.all().order_by('numero')
     return render(request, 'quartos/lista_quartos.html', {'quartos': quartos})
 
 # --- UPDATE ---
+@login_required
 def editar_quarto(request, id):
     quarto = get_object_or_404(Quarto, id=id)
     if request.method == 'POST':
@@ -32,6 +36,7 @@ def editar_quarto(request, id):
     return render(request, 'quartos/form_quarto.html', {'form': form, 'acao': 'Editar Quarto'})
 
 # --- DELETE ---
+@login_required
 def excluir_quarto(request, id):
     quarto = get_object_or_404(Quarto, id=id)
     if request.method == 'POST':

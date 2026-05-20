@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models.hospede import Hospede
 from ..forms.hospede import HospedeForm
+from django.contrib.auth.decorators import login_required # 1. Importe o decorador
 
-# --- CREATE (Cadastrar Hóspede) ---
+@login_required
 def cadastrar_hospede(request):
     if request.method == 'POST':
         form = HospedeForm(request.POST)
@@ -14,11 +15,13 @@ def cadastrar_hospede(request):
     return render(request, 'hospedes/form_hospede.html', {'form': form})
 
 # --- READ (Listar Hóspedes) ---
+@login_required
 def listar_hospedes(request):
     hospedes = Hospede.objects.all()
     return render(request, 'hospedes/lista_hospedes.html', {'hospedes': hospedes})
 
 # --- UPDATE (Editar Hóspede) ---
+@login_required
 def editar_hospede(request, id):
     hospede = get_object_or_404(Hospede, id=id)
     
@@ -33,6 +36,7 @@ def editar_hospede(request, id):
     return render(request, 'hospedes/form_hospede.html', {'form': form})
 
 # --- DELETE (Excluir Hóspede) ---
+@login_required
 def excluir_hospede(request, id):
     hospede = get_object_or_404(Hospede, id=id)
     

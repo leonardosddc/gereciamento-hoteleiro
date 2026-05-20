@@ -1,12 +1,13 @@
 import os
 import mercadopago
-
+from django.contrib.auth.decorators import login_required # 1. Importe o decorador
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models.reserva import Reserva
 from ..models.consumacao import Consumacao
 from ..models.pagamento import Pagamento
 from ..forms.consumacao import ConsumacaoForm
 
+@login_required
 def gerenciar_consumacao(request, reserva_id):
     """
     Tela exclusiva da reserva (RF09) que lista o que o hóspede consumiu
@@ -36,6 +37,7 @@ def gerenciar_consumacao(request, reserva_id):
     }
     return render(request, 'consumacao/gerenciar_consumacao.html', contexto)
 
+@login_required
 def liquidar_consumacao(request, consumacao_id):
     """
     Botão rápido para dar baixa (mudar pago para True) - RF10
@@ -46,6 +48,7 @@ def liquidar_consumacao(request, consumacao_id):
     # Volta para a tela de gerenciamento daquela mesma reserva
     return redirect('gerenciar_consumacao', reserva_id=consumacao.reserva.id)
 
+@login_required
 def pagar_consumacao_online(request, reserva_id):
     """ Gera um link de checkout do Mercado Pago para TODAS as consumações pendentes daquela reserva """
     reserva = get_object_or_404(Reserva, id=reserva_id)

@@ -11,8 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from ..models.pagamento import Pagamento
 from ..forms.pagamento import PagamentoForm
 from ..models.reserva import Reserva
+from django.contrib.auth.decorators import login_required # 1. Importe o decorador
 
-# Nova função: Calcula os valores de todas as reservas e transforma em JSON para o JavaScript
+@login_required
 def obter_valores_reservas():
     valores = {}
     for reserva in Reserva.objects.all():
@@ -24,6 +25,7 @@ def obter_valores_reservas():
     return json.dumps(valores)
 
 # --- CREATE ---
+@login_required
 def cadastrar_pagamento(request):
     if request.method == 'POST':
         form = PagamentoForm(request.POST)
@@ -42,11 +44,13 @@ def cadastrar_pagamento(request):
     return render(request, 'pagamentos/form_pagamento.html', contexto)
 
 # --- READ ---
+@login_required
 def listar_pagamentos(request):
     pagamentos = Pagamento.objects.all().select_related('reserva__hospede', 'reserva__quarto').order_by('-id')
     return render(request, 'pagamentos/lista_pagamentos.html', {'pagamentos': pagamentos})
 
 # --- UPDATE ---
+@login_required
 def editar_pagamento(request, id):
     pagamento = get_object_or_404(Pagamento, id=id)
     if request.method == 'POST':
@@ -65,6 +69,7 @@ def editar_pagamento(request, id):
     return render(request, 'pagamentos/form_pagamento.html', contexto)
 
 # --- DELETE ---
+@login_required
 def excluir_pagamento(request, id):
     pagamento = get_object_or_404(Pagamento, id=id)
     if request.method == 'POST':
@@ -72,6 +77,7 @@ def excluir_pagamento(request, id):
         return redirect('listar_pagamentos')
     return render(request, 'pagamentos/confirmar_exclusao.html', {'pagamento': pagamento})
 
+@login_required
 def gerar_link_pagamento(request, pagamento_id):
     pagamento = get_object_or_404(Pagamento, id=pagamento_id)
     reserva = pagamento.reserva
@@ -117,6 +123,7 @@ def gerar_link_pagamento(request, pagamento_id):
     return redirect('listar_pagamentos')
 
 # Adicione essa função auxiliar no seu views/pagamento.py (pode ser antes do webhook)
+@login_required
 def traduzir_metodo_pagamento(mp_method_id):
     """ Mapeia o retorno de texto do Mercado Pago para os Choices do seu Model """
     method = str(mp_method_id).lower()
@@ -132,6 +139,7 @@ def traduzir_metodo_pagamento(mp_method_id):
 
 # ATUALIZE O SEU WEBHOOK PARA FICAR ASSIM:
 @csrf_exempt
+@login_required
 def webhook_mercado_pago(request):
     if request.method == 'POST':
         try:

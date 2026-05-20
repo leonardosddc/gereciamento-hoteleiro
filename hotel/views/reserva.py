@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models.reserva import Reserva
 from ..forms.reserva import ReservaForm
+from django.contrib.auth.decorators import login_required # 1. Importe o decorador
 
 # --- CREATE ---
+@login_required
 def cadastrar_reserva(request):
     if request.method == 'POST':
         form = ReservaForm(request.POST)
@@ -14,12 +16,14 @@ def cadastrar_reserva(request):
     return render(request, 'reservas/form_reserva.html', {'form': form, 'acao': 'Efetuar Reserva'})
 
 # --- READ ---
+@login_required
 def listar_reservas(request):
     # O select_related ajuda na performance quando temos Chaves Estrangeiras (ForeignKey)
     reservas = Reserva.objects.all().select_related('hospede', 'quarto').order_by('data_checkin')
     return render(request, 'reservas/lista_reservas.html', {'reservas': reservas})
 
 # --- UPDATE ---
+@login_required
 def editar_reserva(request, id):
     reserva = get_object_or_404(Reserva, id=id)
     if request.method == 'POST':
@@ -32,6 +36,7 @@ def editar_reserva(request, id):
     return render(request, 'reservas/form_reserva.html', {'form': form, 'acao': 'Editar Reserva'})
 
 # --- DELETE ---
+@login_required
 def excluir_reserva(request, id):
     reserva = get_object_or_404(Reserva, id=id)
     if request.method == 'POST':

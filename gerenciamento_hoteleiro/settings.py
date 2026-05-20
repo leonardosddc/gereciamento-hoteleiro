@@ -126,3 +126,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Configurações de Login/Logout
+LOGIN_REDIRECT_URL = 'dashboard'  # Para onde vai após logar com sucesso
+LOGIN_URL = 'login'               # Para onde vai se tentar acessar rota bloqueada
+LOGOUT_REDIRECT_URL = 'login'     # Para onde vai após sair do sistema
