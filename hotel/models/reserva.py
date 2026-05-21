@@ -25,3 +25,12 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"Reserva {self.id} - {self.hospede.nome}"
+    
+    def save(self, *args, **kwargs):
+        # Se a reserva está sendo salva como CHECK_OUT...
+        if self.status == self.StatusReserva.CHECK_OUT:
+            # Muda o status do quarto vinculado para SUJO
+            self.quarto.status = self.quarto.StatusQuarto.SUJO
+            self.quarto.save()
+            
+        super().save(*args, **kwargs)
