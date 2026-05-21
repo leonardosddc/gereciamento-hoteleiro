@@ -7,7 +7,7 @@ from datetime import timedelta
 class PagamentoForm(forms.ModelForm):
     class Meta:
         model = Pagamento
-        fields = ['reserva', 'valor_total', 'status']
+        fields = ['reserva', 'valor_total', 'status', 'metodo', 'data_pagamento']
         widgets = {
             'data_pagamento': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }

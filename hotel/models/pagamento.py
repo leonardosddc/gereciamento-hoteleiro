@@ -8,6 +8,7 @@ class Pagamento(models.Model):
         CARTAO_CREDITO = 'CARTAO_CREDITO', 'Cartão de Crédito'
         CARTAO_DEBITO = 'CARTAO_DEBITO', 'Cartão de Débito'
         BOLETO_BANCARIO = 'BOLETO_BANCARIO', 'Boleto Bancário'
+        DINHEIRO = 'DINHEIRO', 'Dinheiro'
 
     class StatusPagamento(models.TextChoices):
         PENDENTE = 'PENDENTE', 'Pendente'
@@ -19,7 +20,7 @@ class Pagamento(models.Model):
 
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
     data_pagamento = models.DateTimeField(null=True, blank=True)
-    metodo = models.CharField(max_length=30, choices=MetodoPagamento.choices, null=True)
+    metodo = models.CharField(max_length=30, choices=MetodoPagamento.choices, null=True, blank=True)
     status = models.CharField(
         max_length=20, 
         choices=StatusPagamento.choices, 
