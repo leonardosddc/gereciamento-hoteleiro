@@ -106,7 +106,7 @@ def gerar_link_pagamento(request, pagamento_id):
             },
         },
         "external_reference": str(pagamento.id),
-        "notification_url": "https://sprint-ladder-steadily.ngrok-free.dev/webhook/mercadopago/",
+        "notification_url": f"{os.getenv("DOMINIO_SISTEMA")}/webhook/mercadopago/",
     }
     # 3. Faz a requisição para criar o Link
     preference_response = sdk.preference().create(preference_data)

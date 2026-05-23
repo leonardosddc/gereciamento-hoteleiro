@@ -85,7 +85,7 @@ def pagar_consumacao_online(request, reserva_id):
             "email": reserva.hospede.email,
         },
         "external_reference": f"CONSUMACAO_{pagamento.id}", # Tag crucial para o Webhook identificar
-        "notification_url": "https://sprint-ladder-steadily.ngrok-free.dev/webhook/mercadopago/",
+        "notification_url": f"{os.getenv("DOMINIO_SISTEMA")}/webhook/mercadopago/",
     }
     
     preference_response = sdk.preference().create(preference_data)
