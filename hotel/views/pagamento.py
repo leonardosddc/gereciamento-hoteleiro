@@ -114,8 +114,8 @@ def gerar_link_pagamento(request, pagamento_id):
 
     # 4. Salva a URL no banco de dados
     if preference.get("id"):
-        pagamento.id_transacao_externa = preference["id"]
-        pagamento.link_pagamento = preference["sandbox_init_point"] 
+        pagamento.id_transacao_externa = preference.get("id")
+        pagamento.link_pagamento = preference.get("sandbox_init_point") 
         pagamento.save()
     
     return redirect('listar_pagamentos')

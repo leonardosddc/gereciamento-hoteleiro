@@ -92,8 +92,8 @@ def pagar_consumacao_online(request, reserva_id):
     preference = preference_response["response"]
     
     if preference.get("id"):
-        pagamento.id_transacao_externa = preference["id"]
-        pagamento.link_pagamento = preference["sandbox_init_point"]
+        pagamento.id_transacao_externa = preference.get("id")
+        pagamento.link_pagamento = preference.get("sandbox_init_point")
         pagamento.save()
         
         # Redireciona o hóspede direto para a tela de pagamento do Mercado Pago
