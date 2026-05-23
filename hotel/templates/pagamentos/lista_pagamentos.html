@@ -83,7 +83,7 @@
                 <tr>
                     <td>{{ pagamento.reserva.hospede.nome }} (Q. {{ pagamento.reserva.quarto.numero }})</td>
                     <td><strong>R$ {{ pagamento.valor_total }}</strong></td>
-                    <td>{{ pagamento.get_metodo_display }}</td>
+                    <td>{{ pagamento.get_metodo_display|default:"-" }}</td>
                     <td><span class="badge badge-{{ pagamento.status }}">{{ pagamento.get_status_display }}</span></td>
                     <td>
                         {% if pagamento.data_pagamento %}
