@@ -81,12 +81,12 @@ WSGI_APPLICATION = 'gerenciamento_hoteleiro.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('DB_NAME', 'hotel'),
-        'USER': os.environ.get('DB_USER', 'admin'),
-        'PASSWORD': os.environ.get('PASSWORD', 'admin'),
-        'HOST': os.environ.get('DB_HOST', 'mysql'),
-        'PORT': os.environ.get('DB_PORT', '3306')
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('PASSWORD', 'postgres'),
+        'HOST': os.environ.get('DB_HOST', 'postgres'),
+        'PORT': os.environ.get('DB_PORT', '5432')
     }
 }
 
