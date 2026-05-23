@@ -20,7 +20,30 @@
         <h2>{{ acao }}</h2>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            
+            {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>⚠️ {{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% for field in form %}
+                <p>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    
+                    {% if field.errors %}
+                        <ul class="errorlist" style="margin-top: 5px; margin-bottom: 0;">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </p>
+            {% endfor %}
+
             <button type="submit">Salvar</button>
         </form>
         <a href="{% url 'listar_quartos' %}" class="btn-voltar">← Voltar para a lista</a>
