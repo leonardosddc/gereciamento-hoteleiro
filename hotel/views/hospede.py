@@ -12,7 +12,7 @@ def cadastrar_hospede(request):
             return redirect('listar_hospedes')
     else:
         form = HospedeForm()
-    return render(request, 'hospedes/form_hospede.html', {'form': form})
+    return render(request, 'hospedes/form_hospede.html', {'form': form, 'acao': 'Novo Hóspede'})
 
 # --- READ (Listar Hóspedes) ---
 @login_required
@@ -33,7 +33,7 @@ def editar_hospede(request, id):
     else:
         form = HospedeForm(instance=hospede)
         
-    return render(request, 'hospedes/form_hospede.html', {'form': form})
+    return render(request, 'hospedes/form_hospede.html', {'form': form, 'acao': 'Editar Hóspede'})
 
 # --- DELETE (Excluir Hóspede) ---
 @login_required
