@@ -7,8 +7,8 @@ class ReservaForm(forms.ModelForm):
         model = Reserva
         fields = ['hospede', 'quarto', 'data_checkin', 'data_checkout', 'status']
         widgets = {
-            'data_checkin': forms.DateInput(attrs={'type': 'date'}),
-            'data_checkout': forms.DateInput(attrs={'type': 'date'}),
+            'data_checkin': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+            'data_checkout': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):

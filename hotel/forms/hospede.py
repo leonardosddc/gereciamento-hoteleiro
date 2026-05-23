@@ -8,7 +8,7 @@ class HospedeForm(forms.ModelForm):
         model = Hospede
         fields = ['nome', 'cpf', 'data_nascimento', 'email', 'telefone']
         widgets = {
-            'data_nascimento': forms.DateInput(attrs={'type': 'date'}),
+            'data_nascimento': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
         }
 
     def clean_nome(self):
@@ -51,7 +51,14 @@ class HospedeForm(forms.ModelForm):
 
     def clean_data_nascimento(self):
         data = self.cleaned_data.get('data_nascimento')
-        # Verifica se a data escolhida é maior que a data de hoje
-        if data and data > date.today():
-            raise forms.ValidationError("A data de nascimento não pode estar no futuro.")
+        
+        if data:
+            # Verifica se a data escolhida é maior que a data de hoje
+            if data > date.today():
+                raise forms.ValidationError("A data de nascimento não pode estar no futuro.")
+            
+            # Nova regra: Verifica se é menor que o ano 1900
+            if data < date(1900, 1, 1):
+                raise forms.ValidationError("A data de nascimento não pode ser anterior a 1900.")
+                
         return data
