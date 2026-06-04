@@ -32,7 +32,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost', 
     '127.0.0.1', 
-    'sprint-ladder-steadily.ngrok-free.dev'
+    'sprint-ladder-steadily.ngrok-free.dev',
+    'gereciamento-hoteleiro.onrender.com'
 ]
 
 
