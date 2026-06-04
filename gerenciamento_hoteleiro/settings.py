@@ -131,6 +131,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 # Configurações de Login/Logout
 LOGIN_REDIRECT_URL = 'dashboard'  # Para onde vai após logar com sucesso
 LOGIN_URL = 'login'               # Para onde vai se tentar acessar rota bloqueada
