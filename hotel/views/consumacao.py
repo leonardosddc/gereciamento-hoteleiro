@@ -99,7 +99,7 @@ def liquidar_consumacao(request, consumacao_id):
 @login_required
 def pagar_consumacao_online(request, reserva_id):
     """ 
-    Gera um link de checkout do Mercado Pago para TODAS as consumações pendentes
+    Gera um link de checkout do Mercado Pago e atrela a todos os itens pendentes
     """
     reserva = get_object_or_404(Reserva, id=reserva_id)
     consumacoes_pendentes = reserva.consumacoes.filter(pago=False)
@@ -109,24 +109,12 @@ def pagar_consumacao_online(request, reserva_id):
     if total_pendente <= 0:
         return redirect('gerenciar_consumacao', reserva_id=reserva.id)
         
-    # --- FAXINA PARA NÃO DUPLICAR VALORES ---
-    # Como vamos gerar um "Pagamento Combo" do Mercado Pago com o valor total,
-    # deletamos as linhas pendentes individuais na aba Pagamentos para não parecer
-    # que o cliente deve o dobro do valor.
-    Pagamento.objects.filter(reserva=reserva, status='PENDENTE', id_transacao_externa__startswith="ITEM_CONS_").delete()
-        
-    pagamento = Pagamento.objects.create(
-        reserva=reserva,
-        valor_total=total_pendente,
-        status='PENDENTE'
-    )
-    
     sdk = mercadopago.SDK(os.getenv("MERCADO_PAGO_ACCESS_TOKEN"))
     
     preference_data = {
         "items": [
             {
-                "id": f"CONSUMACAO_{pagamento.id}",
+                "id": f"COMBO_{reserva.id}",
                 "title": f"Consumações Pendentes - Reserva {reserva.id}",
                 "quantity": 1,
                 "currency_id": "BRL",
@@ -137,7 +125,8 @@ def pagar_consumacao_online(request, reserva_id):
             "name": reserva.hospede.nome,
             "email": reserva.hospede.email,
         },
-        "external_reference": f"CONSUMACAO_{pagamento.id}",
+        # Nova tag exclusiva para avisar o Webhook que é um pagamento em lote
+        "external_reference": f"COMBO_{reserva.id}",
         "notification_url": f"{os.getenv('DOMINIO_SISTEMA')}/webhook/mercadopago/",
     }
     
@@ -145,14 +134,19 @@ def pagar_consumacao_online(request, reserva_id):
     preference = preference_response["response"]
     
     if preference.get("id"):
-        pagamento.id_transacao_externa = preference.get("id")
-        pagamento.link_pagamento = preference.get("sandbox_init_point")
-        pagamento.save()
+        link_combo = preference.get("sandbox_init_point")
         
-        return redirect(pagamento.link_pagamento)
+        # A MÁGICA: Em vez de apagar os itens da tela de pagamentos para agrupar,
+        # nós preservamos eles e apenas atualizamos com o link do combo!
+        Pagamento.objects.filter(
+            reserva=reserva,
+            status='PENDENTE',
+            id_transacao_externa__startswith="ITEM_CONS_"
+        ).update(link_pagamento=link_combo)
+        
+        return redirect(link_combo)
         
     return redirect('gerenciar_consumacao', reserva_id=reserva.id)
-
 
 @login_required
 def excluir_consumacao(request, consumacao_id):

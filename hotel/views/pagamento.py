@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
+from ..models.consumacao import Consumacao
 from ..models.pagamento import Pagamento
 from ..forms.pagamento import PagamentoForm
 from ..models.reserva import Reserva
@@ -173,18 +174,38 @@ def webhook_mercado_pago(request):
                         
                         if pagamento_id_interno and status_pagamento == 'approved':
                             
-                            if str(pagamento_id_interno).startswith("CONSUMACAO_"):
+                            # CENÁRIO 1: É O NOVO COMBO DE CONSUMAÇÃO!
+                            if str(pagamento_id_interno).startswith("COMBO_"):
+                                reserva_id = str(pagamento_id_interno).split("_")[1]
+                                
+                                # 1. Baixa todas as consumações pendentes da comanda
+                                Consumacao.objects.filter(reserva_id=reserva_id, pago=False).update(pago=True)
+                                
+                                # 2. Baixa todos os pagamentos pendentes na tela de Finanças sem perder os nomes
+                                Pagamento.objects.filter(
+                                    reserva_id=reserva_id,
+                                    status='PENDENTE',
+                                    id_transacao_externa__startswith="ITEM_CONS_"
+                                ).update(
+                                    status='CONCLUIDO',
+                                    metodo=metodo_convertido,
+                                    data_pagamento=timezone.now()
+                                )
+                                
+                            # CENÁRIO 2: Lógica Antiga (Mantida só pra não quebrar links que você já gerou hoje)
+                            elif str(pagamento_id_interno).startswith("CONSUMACAO_"):
                                 pk_real = pagamento_id_interno.split("_")[1]
                                 pagamento = Pagamento.objects.filter(id=pk_real).first()
-                            
+                                
                                 if pagamento and pagamento.status != 'CONCLUIDO':
                                     pagamento.status = 'CONCLUIDO'
                                     pagamento.metodo = metodo_convertido
                                     pagamento.data_pagamento = timezone.now()
                                     pagamento.save()
-
+                                    
                                     pagamento.reserva.consumacoes.filter(pago=False).update(pago=True)
-                            
+                                    
+                            # CENÁRIO 3: Pagamento Principal da Diária / Estadia
                             else:
                                 pagamento = Pagamento.objects.filter(id=pagamento_id_interno).first()
 
@@ -193,7 +214,7 @@ def webhook_mercado_pago(request):
                                     pagamento.metodo = metodo_convertido
                                     pagamento.data_pagamento = timezone.now()
                                     pagamento.save()
-                                
+                                    
             return JsonResponse({"status": "sucesso"}, status=200)
         except Exception as e:
             return JsonResponse({"erro": str(e)}, status=400)
