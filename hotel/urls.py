@@ -3,6 +3,7 @@ from .views.home import dashboard
 from .views.hospede import cadastrar_hospede, listar_hospedes, editar_hospede, excluir_hospede
 from .views.quarto import cadastrar_quarto, listar_quartos, editar_quarto, excluir_quarto
 from .views.reserva import cadastrar_reserva, listar_reservas, editar_reserva, excluir_reserva
+from .views.consumacao import gerenciar_consumacao, liquidar_consumacao, pagar_consumacao_online, excluir_consumacao
 from .views.pagamento import (
     cadastrar_pagamento,
     listar_pagamentos,
@@ -52,4 +53,5 @@ urlpatterns = [
     path('reservas/<int:reserva_id>/consumacao/', gerenciar_consumacao, name='gerenciar_consumacao'),
     path('reservas/<int:reserva_id>/consumacao/pagar-online/', pagar_consumacao_online, name='pagar_consumacao_online'),
     path('consumacao/liquidar/<int:consumacao_id>/', liquidar_consumacao, name='liquidar_consumacao'),
+    path('consumacao/excluir/<int:consumacao_id>/', excluir_consumacao, name='excluir_consumacao'),
 ]

@@ -120,12 +120,15 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    {% if not c.pago %}
-                                        <a href="{% url 'liquidar_consumacao' c.id %}" class="btn btn-sm btn-outline-primary">Quitar</a>
-                                    {% else %}
-                                        <span class="text-muted small">Quitado</span>
-                                    {% endif %}
-                                </td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        {% if not c.pago %}
+                                            <a href="{% url 'liquidar_consumacao' c.id %}" class="btn btn-sm btn-outline-primary">Quitar</a>
+                                        {% else %}
+                                            <span class="text-muted small align-self-center">Quitado</span>
+                                        {% endif %}
+                                        <a href="{% url 'excluir_consumacao' c.id %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+                                    </div>
+                            </td>
                             </tr>
                             {% empty %}
                             <tr>

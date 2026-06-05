@@ -46,8 +46,23 @@ def cadastrar_pagamento(request):
 # --- READ ---
 @login_required
 def listar_pagamentos(request):
+    # Busca todos os pagamentos e todas as reservas
     pagamentos = Pagamento.objects.all().select_related('reserva__hospede', 'reserva__quarto').order_by('-id')
-    return render(request, 'pagamentos/lista_pagamentos.html', {'pagamentos': pagamentos})
+    reservas = Reserva.objects.all().select_related('hospede')
+    
+    # Verifica se o usuário selecionou alguma reserva no filtro (via URL ?reserva_id=X)
+    reserva_id = request.GET.get('reserva_id')
+    
+    if reserva_id:
+        # Se filtrou, recorta a lista de pagamentos apenas para aquela reserva
+        pagamentos = pagamentos.filter(reserva_id=reserva_id)
+        
+    contexto = {
+        'pagamentos': pagamentos,
+        'reservas': reservas,
+        'filtro_atual': reserva_id
+    }
+    return render(request, 'pagamentos/lista_pagamentos.html', contexto)
 
 # --- UPDATE ---
 @login_required
