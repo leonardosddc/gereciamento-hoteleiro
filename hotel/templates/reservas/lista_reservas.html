@@ -21,6 +21,16 @@
         .badge-CHECK_IN { background-color: #28a745; }
         .badge-CHECK_OUT { background-color: #6c757d; }
         .badge-CANCELADA { background-color: #dc3545; }
+        /* Adicione isso junto aos outros estilos */
+        .acoes-flex { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+            flex-wrap: nowrap; 
+        }
+        .btn-editar, .btn-consumacao, .btn-excluir {
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -49,9 +59,11 @@
                     <td>{{ reserva.data_checkout|date:"d/m/Y" }}</td>
                     <td><span class="badge badge-{{ reserva.status }}">{{ reserva.get_status_display }}</span></td>
                     <td>
-                        <a href="{% url 'editar_reserva' reserva.id %}" class="btn-editar">Editar</a>
-                        <a href="{% url 'gerenciar_consumacao' reserva.id %}" class="btn-consumacao">Consumação</a>
-                        <a href="{% url 'excluir_reserva' reserva.id %}" class="btn-excluir">Excluir</a>
+                        <div class="acoes-flex">
+                            <a href="{% url 'editar_reserva' reserva.id %}" class="btn-editar">Editar</a>
+                            <a href="{% url 'gerenciar_consumacao' reserva.id %}" class="btn-consumacao">Consumação</a>
+                            <a href="{% url 'excluir_reserva' reserva.id %}" class="btn-excluir">Excluir</a>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
