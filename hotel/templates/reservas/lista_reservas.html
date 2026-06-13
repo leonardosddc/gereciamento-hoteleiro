@@ -61,7 +61,12 @@
                     <td>
                         <div class="acoes-flex">
                             <a href="{% url 'editar_reserva' reserva.id %}" class="btn-editar">Editar</a>
-                            <a href="{% url 'gerenciar_consumacao' reserva.id %}" class="btn-consumacao">Consumação</a>
+                            
+                            {% if reserva.status == 'CHECK_IN' or reserva.status == 'CHECK_OUT' %}
+                                <a href="{% url 'gerenciar_consumacao' reserva.id %}" class="btn-consumacao">Consumação</a>
+                            {% else %}
+                                <span class="text-muted" style="font-size: 14px; cursor: not-allowed; opacity: 0.6;" title="Apenas após Check-in">Consumação</span>
+                            {% endif %}
                             <a href="{% url 'excluir_reserva' reserva.id %}" class="btn-excluir">Excluir</a>
                         </div>
                     </td>

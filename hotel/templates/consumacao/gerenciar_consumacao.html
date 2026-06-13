@@ -47,35 +47,43 @@
         </div>
 
         <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="card-title mb-0">Novo Lançamento</h5>
+            
+            {% if reserva.status == 'AGENDADA' or reserva.status == 'CANCELADA' %}
+                <div class="alert alert-danger shadow-sm text-center">
+                    <h5 class="alert-heading mt-2">🛑 Bloqueado</h5>
+                    <p class="small mb-2">Não é possível registrar consumação. O hóspede ainda não realizou o Check-in ou a reserva foi cancelada.</p>
                 </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Item / Serviço</label>
-                            {{ form.item }}
-                        </div>
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="form-label">Qtd</label>
-                                {{ form.quantidade }}
+            {% else %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="card-title mb-0">Novo Lançamento</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Item / Serviço</label>
+                                {{ form.item }}
                             </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label">Valor Un.</label>
-                                {{ form.valor_unitario }}
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label">Qtd</label>
+                                    {{ form.quantidade }}
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label">Valor Un.</label>
+                                    {{ form.valor_unitario }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-check mb-3">
-                            {{ form.pago }}
-                            <label class="form-check-label">Já está pago?</label>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100 py-2">Registrar Consumo</button>
-                    </form>
+                            <div class="form-check mb-3">
+                                {{ form.pago }}
+                                <label class="form-check-label">Já está pago?</label>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 py-2">Registrar Consumo</button>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
 
             {% if total_pendente > 0 %}
             <div class="alert alert-warning border-warning shadow-sm">
