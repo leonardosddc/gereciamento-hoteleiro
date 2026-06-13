@@ -57,9 +57,9 @@ class ReservaForm(forms.ModelForm):
 
                 # Se houver conflitos de agenda, exibe o erro na tela anexado ao campo do Quarto
                 if reservas_conflitantes.exists():
-                    self.add_error('quarto', "Overbooking bloqueado! Este quarto já possui uma reserva ativa para esse período.")
+                    self.add_error('quarto', "Overbooking blocked! Este quarto já possui uma reserva ativa para esse período.")
 
-       # --- REGRAS DE NEGÓCIO DO TCC (Trava de Status) ---
+        # --- REGRAS DE NEGÓCIO DO TCC (Trava de Status) ---
         if self.instance.pk: # Se a reserva já existe no banco...
             
             # REGRA 1: Bloqueia Check-in se a diária não estiver paga
