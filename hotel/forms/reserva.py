@@ -59,7 +59,7 @@ class ReservaForm(forms.ModelForm):
                 if reservas_conflitantes.exists():
                     self.add_error('quarto', "Overbooking bloqueado! Este quarto já possui uma reserva ativa para esse período.")
 
-        # --- REGRAS DE NEGÓCIO DO TCC (Trava de Status) ---
+       # --- REGRAS DE NEGÓCIO DO TCC (Trava de Status) ---
         if self.instance.pk: # Se a reserva já existe no banco...
             
             # REGRA 1: Bloqueia Check-in se a diária não estiver paga
@@ -68,8 +68,15 @@ class ReservaForm(forms.ModelForm):
                 if not pagamento_ok:
                     self.add_error('status', "Check-in bloqueado: O pagamento da estadia ainda não foi concluído.")
             
-            # REGRA 2: Bloqueia Check-out se houver consumação pendente
+            # REGRA 2: Bloqueia Check-out se houver consumação pendente OU se não tiver feito Check-in
             if status == 'CHECK_OUT':
+                
+                # --- NOVA TRAVA DE ESTADO ---
+                # Se o status atual no banco é Agendada, ele não pode pular para Check-out
+                if self.instance.status == 'AGENDADA':
+                    self.add_error('status', "Operação inválida: Não é possível fazer Check-out sem antes realizar o Check-in do hóspede.")
+                # -----------------------------
+                
                 consumacoes_pendentes = self.instance.consumacoes.filter(pago=False)
                 if consumacoes_pendentes.exists():
                     total_devendo = sum(c.valor_total for c in consumacoes_pendentes)
